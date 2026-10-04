@@ -2,6 +2,8 @@ package io.github.emberbocor.villagertradepeek.trade;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import io.github.emberbocor.villagertradepeek.ModAttachments;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.npc.VillagerData;
@@ -28,6 +30,12 @@ public final class FutureTradeManager {
         villager.getOffers().addAll(offers);
         store(villager, stored.withoutLevel(data.getLevel()));
         return true;
+    }
+
+    @Nullable
+    public static FutureTrades currentTrades(Villager villager) {
+        FutureTrades stored = villager.getExistingDataOrNull(ModAttachments.FUTURE_TRADES);
+        return stored != null && stored.profession() == villager.getVillagerData().getProfession() ? stored : null;
     }
 
     public static void onTradesUpdated(Villager villager) {

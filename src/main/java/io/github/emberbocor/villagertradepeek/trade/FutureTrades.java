@@ -39,4 +39,11 @@ public record FutureTrades(VillagerProfession profession, Map<Integer, List<Merc
     public boolean isEmpty() {
         return levels.values().stream().allMatch(List::isEmpty);
     }
+
+    public List<LockedTrade> lockedTrades() {
+        return levels.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .flatMap(entry -> entry.getValue().stream().map(offer -> new LockedTrade(entry.getKey(), offer)))
+                .toList();
+    }
 }

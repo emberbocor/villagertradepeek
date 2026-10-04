@@ -6,6 +6,9 @@
     "AbstractVillagerInvoker",
     "VillagerMixin"
   ],
+  "client": [
+    "MerchantScreenMixin"
+  ],
   "injectors": {
     "defaultRequire": 1
   },
