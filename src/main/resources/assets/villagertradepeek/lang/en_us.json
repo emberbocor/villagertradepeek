@@ -1,0 +1,13 @@
+{
+  "itemGroup.villagertradepeek": "Example Mod Tab",
+  "block.villagertradepeek.example_block": "Example Block",
+  "item.villagertradepeek.example_item": "Example Item",
+
+  "villagertradepeek.configuration.title": "Villager Trade Peek Configs",
+  "villagertradepeek.configuration.section.villagertradepeek.common.toml": "Villager Trade Peek Configs",
+  "villagertradepeek.configuration.section.villagertradepeek.common.toml.title": "Villager Trade Peek Configs",
+  "villagertradepeek.configuration.items": "Item List",
+  "villagertradepeek.configuration.logDirtBlock": "Log Dirt Block",
+  "villagertradepeek.configuration.magicNumberIntroduction": "Magic Number Text",
+  "villagertradepeek.configuration.magicNumber": "Magic Number"
+}
