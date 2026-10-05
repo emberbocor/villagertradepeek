@@ -26,6 +26,7 @@ import net.minecraft.client.gui.screens.inventory.MerchantScreen;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.MerchantMenu;
 import net.minecraft.world.item.ItemStack;
@@ -66,6 +67,7 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
     @Override
     public void villagertradepeek$setLockedTrades(List<LockedTrade> trades) {
         villagertradepeek$lockedTrades = trades;
+        scrollOff = Mth.clamp(scrollOff, 0, Math.max(0, menu.getOffers().size() + trades.size() - VISIBLE_ROWS));
     }
 
     @ModifyExpressionValue(method = {"render", "renderScroller", "mouseScrolled", "mouseDragged", "mouseClicked"},

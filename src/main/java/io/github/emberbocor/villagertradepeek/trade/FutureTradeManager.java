@@ -27,7 +27,6 @@ public final class FutureTradeManager {
         return true;
     }
 
-    @Nullable
     public static FutureTrades previewTrades(Villager villager) {
         villager.getOffers();
         int level = villager.getVillagerData().getLevel();
@@ -36,13 +35,15 @@ public final class FutureTradeManager {
         if (!trades.equals(stored)) {
             store(villager, trades);
         }
-        return trades.isEmpty() ? null : trades;
+        return trades;
     }
 
-    public static void onTradesUpdated(Villager villager) {
-        if (villager.getVillagerData().getLevel() == VillagerData.MIN_VILLAGER_LEVEL) {
-            villager.removeData(ModAttachments.FUTURE_TRADES);
+    public static boolean discardOnLevelOneTrades(Villager villager) {
+        if (villager.getVillagerData().getLevel() != VillagerData.MIN_VILLAGER_LEVEL) {
+            return false;
         }
+        villager.removeData(ModAttachments.FUTURE_TRADES);
+        return true;
     }
 
     @Nullable

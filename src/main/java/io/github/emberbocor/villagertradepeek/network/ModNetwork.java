@@ -3,7 +3,6 @@ package io.github.emberbocor.villagertradepeek.network;
 import io.github.emberbocor.villagertradepeek.client.ClientPayloadHandler;
 import io.github.emberbocor.villagertradepeek.mixin.MerchantMenuAccessor;
 import io.github.emberbocor.villagertradepeek.trade.FutureTradeManager;
-import io.github.emberbocor.villagertradepeek.trade.FutureTrades;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.inventory.MerchantMenu;
@@ -13,6 +12,8 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 
 public final class ModNetwork {
     private static final String PROTOCOL_VERSION = "1";
+
+    private static boolean syncing;
 
     private ModNetwork() {
     }
@@ -26,10 +27,27 @@ public final class ModNetwork {
         if (event.getEntity() instanceof ServerPlayer player
                 && event.getContainer() instanceof MerchantMenu menu
                 && ((MerchantMenuAccessor) menu).villagertradepeek$getTrader() instanceof Villager villager) {
-            FutureTrades trades = FutureTradeManager.previewTrades(villager);
-            if (trades != null) {
-                PacketDistributor.sendToPlayer(player, new FutureTradesPayload(menu.containerId, trades.lockedTrades()));
-            }
+            sync(player, menu, villager);
+        }
+    }
+
+    public static void syncTradingPlayer(Villager villager) {
+        if (villager.getTradingPlayer() instanceof ServerPlayer player
+                && player.containerMenu instanceof MerchantMenu menu
+                && ((MerchantMenuAccessor) menu).villagertradepeek$getTrader() == villager) {
+            sync(player, menu, villager);
+        }
+    }
+
+    private static void sync(ServerPlayer player, MerchantMenu menu, Villager villager) {
+        if (syncing) {
+            return;
+        }
+        syncing = true;
+        try {
+            PacketDistributor.sendToPlayer(player, new FutureTradesPayload(menu.containerId, FutureTradeManager.previewTrades(villager).lockedTrades()));
+        } finally {
+            syncing = false;
         }
     }
 }

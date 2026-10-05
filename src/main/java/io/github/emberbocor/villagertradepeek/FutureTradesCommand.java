@@ -30,13 +30,17 @@ public final class FutureTradesCommand {
                 .requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.literal("future")
                         .then(Commands.argument("villager", EntityArgument.entity())
-                                .executes(context -> print(context.getSource(), EntityArgument.getEntity(context, "villager"))))));
+                                .executes(context -> print(context.getSource(), villager(EntityArgument.getEntity(context, "villager")))))));
     }
 
-    private static int print(CommandSourceStack source, Entity entity) throws CommandSyntaxException {
-        if (!(entity instanceof Villager villager)) {
-            throw NOT_A_VILLAGER.create();
+    private static Villager villager(Entity entity) throws CommandSyntaxException {
+        if (entity instanceof Villager villager) {
+            return villager;
         }
+        throw NOT_A_VILLAGER.create();
+    }
+
+    private static int print(CommandSourceStack source, Villager villager) {
         FutureTrades stored = villager.getExistingData(ModAttachments.FUTURE_TRADES).orElse(null);
         if (stored == null) {
             source.sendSuccess(() -> Component.literal("No future trades stored"), false);
