@@ -3,11 +3,17 @@ package io.github.emberbocor.villagertradepeek.trade;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
 
+import org.slf4j.Logger;
+
+import com.mojang.logging.LogUtils;
+
 import io.github.emberbocor.villagertradepeek.mixin.AbstractVillagerInvoker;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.npc.VillagerData;
 import net.minecraft.world.entity.npc.VillagerProfession;
@@ -17,12 +23,14 @@ import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.item.trading.MerchantOffers;
 
 public final class FutureTradeGenerator {
+    private static final Logger LOGGER = LogUtils.getLogger();
     private static final int TRADES_PER_LEVEL = 2;
 
     private FutureTradeGenerator() {
     }
 
     public static FutureTrades generate(Villager villager, int fromLevel) {
+        long startTime = System.nanoTime();
         VillagerProfession profession = villager.getVillagerData().getProfession();
         Int2ObjectMap<VillagerTrades.ItemListing[]> pool = tradePool(villager, profession);
         Map<Integer, List<MerchantOffer>> levels = new HashMap<>();
@@ -36,6 +44,8 @@ public final class FutureTradeGenerator {
                 }
             }
         }
+        LOGGER.debug("Generated future trades for {} from level {} in {} ms",
+                BuiltInRegistries.VILLAGER_PROFESSION.getKey(profession), fromLevel, TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime));
         return new FutureTrades(profession, levels);
     }
 

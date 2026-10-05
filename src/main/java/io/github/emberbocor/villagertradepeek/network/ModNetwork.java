@@ -21,7 +21,7 @@ public final class ModNetwork {
     }
 
     public static void sendFutureTrades(ServerPlayer player, Villager villager) {
-        FutureTrades trades = FutureTradeManager.currentTrades(villager);
+        FutureTrades trades = FutureTradeManager.previewTrades(villager);
         if (trades != null && player.containerMenu instanceof MerchantMenu menu) {
             PacketDistributor.sendToPlayer(player, new FutureTradesPayload(menu.containerId, trades.lockedTrades()));
         }

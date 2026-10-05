@@ -28,14 +28,19 @@ public final class FutureTradeManager {
             return false;
         }
         villager.getOffers().addAll(offers);
-        store(villager, stored.withoutLevel(data.getLevel()));
+        store(villager, stored.above(data.getLevel()));
         return true;
     }
 
     @Nullable
-    public static FutureTrades currentTrades(Villager villager) {
+    public static FutureTrades previewTrades(Villager villager) {
+        VillagerData data = villager.getVillagerData();
         FutureTrades stored = villager.getExistingDataOrNull(ModAttachments.FUTURE_TRADES);
-        return stored != null && stored.profession() == villager.getVillagerData().getProfession() ? stored : null;
+        FutureTrades trades = stored != null && stored.profession() == data.getProfession()
+                ? stored.above(data.getLevel())
+                : FutureTradeGenerator.generate(villager, data.getLevel() + 1);
+        store(villager, trades);
+        return trades.isEmpty() ? null : trades;
     }
 
     public static void onTradesUpdated(Villager villager) {

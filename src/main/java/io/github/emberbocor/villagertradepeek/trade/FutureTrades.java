@@ -30,9 +30,9 @@ public record FutureTrades(VillagerProfession profession, Map<Integer, List<Merc
         levels = Map.copyOf(levels);
     }
 
-    public FutureTrades withoutLevel(int level) {
+    public FutureTrades above(int level) {
         Map<Integer, List<MerchantOffer>> remaining = new HashMap<>(levels);
-        remaining.remove(level);
+        remaining.keySet().removeIf(key -> key <= level);
         return new FutureTrades(profession, remaining);
     }
 
