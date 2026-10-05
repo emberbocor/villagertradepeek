@@ -4,7 +4,7 @@ See every trade a villager will ever offer before you commit to it.
 
 Villager Trade Peek shows all trades a villager unlocks at future levels, up to Master, right in the vanilla trading screen. Locked trades are drawn greyed out below the trades that are already available, and hovering one tells you which level unlocks it.
 
-![Scrolling through locked trades in the trading screen](docs/preview.gif)
+![Scrolling through locked trades in the trading screen](docs/preview.png)
 
 ## Features
 

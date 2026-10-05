@@ -14,45 +14,45 @@ public final class FutureTradeManager {
     }
 
     public static boolean unlockStoredTrades(Villager villager) {
-        FutureTrades stored = villager.getExistingData(ModAttachments.FUTURE_TRADES).orElse(null);
-        if (stored == null) {
-            return false;
-        }
-        VillagerData data = villager.getVillagerData();
-        if (stored.profession() != data.getProfession()) {
-            villager.removeData(ModAttachments.FUTURE_TRADES);
-            return false;
-        }
-        List<MerchantOffer> offers = stored.levels().get(data.getLevel());
+        FutureTrades stored = storedTrades(villager);
+        int level = villager.getVillagerData().getLevel();
+        List<MerchantOffer> offers = stored != null ? stored.levels().get(level) : null;
         if (offers == null) {
             return false;
         }
         for (MerchantOffer offer : offers) {
             villager.getOffers().add(DeferredMapTrades.resolve(villager, offer));
         }
-        store(villager, stored.above(data.getLevel()));
+        store(villager, stored.above(level));
         return true;
     }
 
     @Nullable
     public static FutureTrades previewTrades(Villager villager) {
-        VillagerData data = villager.getVillagerData();
-        FutureTrades stored = villager.getExistingData(ModAttachments.FUTURE_TRADES).orElse(null);
-        FutureTrades trades = stored != null && stored.profession() == data.getProfession()
-                ? stored.above(data.getLevel())
-                : FutureTradeGenerator.generate(villager, data.getLevel() + 1);
-        store(villager, trades);
+        villager.getOffers();
+        int level = villager.getVillagerData().getLevel();
+        FutureTrades stored = storedTrades(villager);
+        FutureTrades trades = stored != null ? stored.above(level) : FutureTradeGenerator.generate(villager, level + 1);
+        if (!trades.equals(stored)) {
+            store(villager, trades);
+        }
         return trades.isEmpty() ? null : trades;
     }
 
     public static void onTradesUpdated(Villager villager) {
         if (villager.getVillagerData().getLevel() == VillagerData.MIN_VILLAGER_LEVEL) {
-            store(villager, FutureTradeGenerator.generate(villager, VillagerData.MIN_VILLAGER_LEVEL + 1));
+            villager.removeData(ModAttachments.FUTURE_TRADES);
         }
     }
 
+    @Nullable
+    private static FutureTrades storedTrades(Villager villager) {
+        FutureTrades stored = villager.getExistingData(ModAttachments.FUTURE_TRADES).orElse(null);
+        return stored != null && stored.profession() == villager.getVillagerData().getProfession() ? stored : null;
+    }
+
     private static void store(Villager villager, FutureTrades trades) {
-        if (trades.isEmpty()) {
+        if (trades.levels().isEmpty()) {
             villager.removeData(ModAttachments.FUTURE_TRADES);
         } else {
             villager.setData(ModAttachments.FUTURE_TRADES, trades);

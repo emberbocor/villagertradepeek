@@ -18,6 +18,7 @@ public class VillagerTradePeek {
     public VillagerTradePeek(IEventBus modEventBus) {
         ModAttachments.ATTACHMENT_TYPES.register(modEventBus);
         modEventBus.addListener(ModNetwork::register);
+        NeoForge.EVENT_BUS.addListener(ModNetwork::onContainerOpen);
         NeoForge.EVENT_BUS.addListener((RegisterCommandsEvent event) -> FutureTradesCommand.register(event.getDispatcher()));
     }
 }
