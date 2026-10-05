@@ -37,7 +37,7 @@ public final class FutureTradesCommand {
         if (!(entity instanceof Villager villager)) {
             throw NOT_A_VILLAGER.create();
         }
-        FutureTrades stored = villager.getExistingDataOrNull(ModAttachments.FUTURE_TRADES);
+        FutureTrades stored = villager.getExistingData(ModAttachments.FUTURE_TRADES).orElse(null);
         if (stored == null) {
             source.sendSuccess(() -> Component.literal("No future trades stored"), false);
             return 0;

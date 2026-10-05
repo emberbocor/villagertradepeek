@@ -14,7 +14,7 @@ public final class FutureTradeManager {
     }
 
     public static boolean unlockStoredTrades(Villager villager) {
-        FutureTrades stored = villager.getExistingDataOrNull(ModAttachments.FUTURE_TRADES);
+        FutureTrades stored = villager.getExistingData(ModAttachments.FUTURE_TRADES).orElse(null);
         if (stored == null) {
             return false;
         }
@@ -37,7 +37,7 @@ public final class FutureTradeManager {
     @Nullable
     public static FutureTrades previewTrades(Villager villager) {
         VillagerData data = villager.getVillagerData();
-        FutureTrades stored = villager.getExistingDataOrNull(ModAttachments.FUTURE_TRADES);
+        FutureTrades stored = villager.getExistingData(ModAttachments.FUTURE_TRADES).orElse(null);
         FutureTrades trades = stored != null && stored.profession() == data.getProfession()
                 ? stored.above(data.getLevel())
                 : FutureTradeGenerator.generate(villager, data.getLevel() + 1);
