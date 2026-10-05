@@ -27,7 +27,9 @@ public final class FutureTradeManager {
         if (offers == null) {
             return false;
         }
-        villager.getOffers().addAll(offers);
+        for (MerchantOffer offer : offers) {
+            villager.getOffers().add(DeferredMapTrades.resolve(villager, offer));
+        }
         store(villager, stored.above(data.getLevel()));
         return true;
     }

@@ -39,7 +39,7 @@ public final class FutureTradeGenerator {
                 VillagerTrades.ItemListing[] listings = pool.get(level);
                 if (listings != null) {
                     MerchantOffers offers = new MerchantOffers();
-                    ((AbstractVillagerInvoker) villager).villagertradepeek$addOffersFromItemListings(offers, listings, TRADES_PER_LEVEL);
+                    ((AbstractVillagerInvoker) villager).villagertradepeek$addOffersFromItemListings(offers, DeferredMapTrades.defer(listings), TRADES_PER_LEVEL);
                     levels.put(level, List.copyOf(offers));
                 }
             }
