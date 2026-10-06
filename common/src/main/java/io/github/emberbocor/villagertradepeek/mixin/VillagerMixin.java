@@ -5,7 +5,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import io.github.emberbocor.villagertradepeek.network.ModNetwork;
+import io.github.emberbocor.villagertradepeek.network.FutureTradeSync;
 import io.github.emberbocor.villagertradepeek.trade.FutureTradeManager;
 import net.minecraft.world.entity.npc.Villager;
 
@@ -22,7 +22,7 @@ public abstract class VillagerMixin {
     private void villagertradepeek$discardRerolledFutureTrades(CallbackInfo ci) {
         Villager villager = (Villager) (Object) this;
         if (FutureTradeManager.discardOnLevelOneTrades(villager)) {
-            ModNetwork.syncTradingPlayer(villager);
+            FutureTradeSync.syncTradingPlayer(villager);
         }
     }
 }

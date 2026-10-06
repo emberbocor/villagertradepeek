@@ -18,6 +18,7 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import io.github.emberbocor.villagertradepeek.client.LockedTradesHolder;
+import io.github.emberbocor.villagertradepeek.platform.ClientServices;
 import io.github.emberbocor.villagertradepeek.trade.LockedTrade;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
@@ -116,7 +117,7 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
         } else {
             List<Component> lines = new ArrayList<>(getTooltipFromContainerItem(stack));
             lines.add(unlocksAt);
-            guiGraphics.renderTooltip(font, lines, stack.getTooltipImage(), stack, mouseX, mouseY);
+            ClientServices.PLATFORM.renderItemTooltip(guiGraphics, font, lines, stack, mouseX, mouseY);
         }
     }
 

@@ -7,6 +7,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 
+import io.github.emberbocor.villagertradepeek.trade.FutureTradeStorage;
 import io.github.emberbocor.villagertradepeek.trade.FutureTrades;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -41,7 +42,7 @@ public final class FutureTradesCommand {
     }
 
     private static int print(CommandSourceStack source, Villager villager) {
-        FutureTrades stored = villager.getExistingData(ModAttachments.FUTURE_TRADES).orElse(null);
+        FutureTrades stored = FutureTradeStorage.get(villager).orElse(null);
         if (stored == null) {
             source.sendSuccess(() -> Component.literal("No future trades stored"), false);
             return 0;
