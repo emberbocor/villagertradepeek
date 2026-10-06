@@ -60,6 +60,11 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
         super(menu, playerInventory, title);
     }
 
+    @Shadow
+    private void renderAndDecorateCostA(GuiGraphics guiGraphics, ItemStack realCost, ItemStack baseCost, int x, int y) {
+        throw new AssertionError();
+    }
+
     @Override
     public List<LockedTrade> villagertradepeek$getLockedTrades() {
         return villagertradepeek$lockedTrades;
@@ -146,7 +151,7 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
         int itemY = y + 1;
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(0.0F, 0.0F, 100.0F);
-        villagertradepeek$renderItem(guiGraphics, offer.getCostA(), x + 5, itemY);
+        renderAndDecorateCostA(guiGraphics, offer.getCostA(), offer.getBaseCostA(), x + 5, itemY);
         villagertradepeek$renderItem(guiGraphics, offer.getCostB(), x + 35, itemY);
         RenderSystem.enableBlend();
         guiGraphics.blitSprite(TRADE_ARROW_SPRITE, x + 55, itemY + 3, 10, 9);
