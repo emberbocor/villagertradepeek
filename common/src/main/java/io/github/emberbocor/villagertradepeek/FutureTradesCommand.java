@@ -4,9 +4,11 @@ import java.util.List;
 import java.util.Map;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 
+import io.github.emberbocor.villagertradepeek.platform.Services;
 import io.github.emberbocor.villagertradepeek.trade.FutureTradeStorage;
 import io.github.emberbocor.villagertradepeek.trade.FutureTrades;
 import net.minecraft.commands.CommandSourceStack;
@@ -15,23 +17,33 @@ import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.entity.npc.VillagerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.trading.MerchantOffer;
+import net.minecraft.world.item.trading.MerchantOffers;
 
 public final class FutureTradesCommand {
     private static final SimpleCommandExceptionType NOT_A_VILLAGER = new SimpleCommandExceptionType(Component.literal("Target is not a villager"));
+    private static final SimpleCommandExceptionType NOT_LEVEL_ONE = new SimpleCommandExceptionType(Component.literal("Villager is not level 1"));
 
     private FutureTradesCommand() {
     }
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
-        dispatcher.register(Commands.literal(VillagerTradePeek.MODID)
+        LiteralArgumentBuilder<CommandSourceStack> root = Commands.literal(VillagerTradePeek.MODID)
                 .requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.literal("future")
                         .then(Commands.argument("villager", EntityArgument.entity())
-                                .executes(context -> print(context.getSource(), villager(EntityArgument.getEntity(context, "villager")))))));
+                                .executes(context -> print(context.getSource(), villager(EntityArgument.getEntity(context, "villager"))))));
+        if (Services.PLATFORM.isDevelopmentEnvironment()) {
+            root.then(Commands.literal("reroll")
+                    .then(Commands.argument("villager", EntityArgument.entity())
+                            .executes(context -> reroll(context.getSource(), villager(EntityArgument.getEntity(context, "villager"))))));
+        }
+        dispatcher.register(root);
     }
 
     private static Villager villager(Entity entity) throws CommandSyntaxException {
@@ -52,6 +64,20 @@ public final class FutureTradesCommand {
                 .sorted(Map.Entry.comparingByKey())
                 .forEach(entry -> printLevel(source, entry.getKey(), entry.getValue()));
         return stored.levels().size();
+    }
+
+    private static int reroll(CommandSourceStack source, Villager villager) throws CommandSyntaxException {
+        if (villager.getVillagerData().getLevel() != VillagerData.MIN_VILLAGER_LEVEL) {
+            throw NOT_LEVEL_ONE.create();
+        }
+        villager.setOffers(null);
+        MerchantOffers offers = villager.getOffers();
+        if (villager.getTradingPlayer() instanceof ServerPlayer player) {
+            player.sendMerchantOffers(player.containerMenu.containerId, offers, VillagerData.MIN_VILLAGER_LEVEL,
+                    villager.getVillagerXp(), villager.showProgressBar(), villager.canRestock());
+        }
+        source.sendSuccess(() -> Component.literal("Rerolled level 1 trades"), true);
+        return 1;
     }
 
     private static void printLevel(CommandSourceStack source, int level, List<MerchantOffer> offers) {
