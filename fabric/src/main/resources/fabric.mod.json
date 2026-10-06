@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "${mod_id}",
+  "version": "${mod_version}",
+  "name": "${mod_name}",
+  "description": "Shows every trade a villager will unlock at future levels in the trading screen.",
+  "authors": [
+    "emberbocor"
+  ],
+  "contact": {
+    "homepage": "https://github.com/emberbocor/villagertradepeek",
+    "sources": "https://github.com/emberbocor/villagertradepeek",
+    "issues": "https://github.com/emberbocor/villagertradepeek/issues"
+  },
+  "license": "${mod_license}",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "io.github.emberbocor.villagertradepeek.VillagerTradePeekFabric"
+    ],
+    "client": [
+      "io.github.emberbocor.villagertradepeek.VillagerTradePeekFabricClient"
+    ]
+  },
+  "mixins": [
+    "${mod_id}.mixins.json",
+    "${mod_id}.fabric.mixins.json"
+  ],
+  "accessWidener": "${mod_id}.accesswidener",
+  "depends": {
+    "fabricloader": "${fabric_loader_version_range}",
+    "fabric-api": "*",
+    "minecraft": "${fabric_minecraft_version_range}",
+    "java": ">=21"
+  }
+}

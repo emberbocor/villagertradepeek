@@ -33,7 +33,7 @@ public final class FutureTradeSync {
     }
 
     private static void sync(ServerPlayer player, MerchantMenu menu, Villager villager) {
-        if (syncing) {
+        if (syncing || !Services.PLATFORM.canReceiveFutureTrades(player)) {
             return;
         }
         syncing = true;

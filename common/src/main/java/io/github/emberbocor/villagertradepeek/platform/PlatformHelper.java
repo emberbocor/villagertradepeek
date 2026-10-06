@@ -6,5 +6,7 @@ import net.minecraft.server.level.ServerPlayer;
 public interface PlatformHelper {
     boolean isDevelopmentEnvironment();
 
+    boolean canReceiveFutureTrades(ServerPlayer player);
+
     void sendFutureTrades(ServerPlayer player, FutureTradesPayload payload);
 }

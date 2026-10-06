@@ -7,7 +7,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.WeakHashMap;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;

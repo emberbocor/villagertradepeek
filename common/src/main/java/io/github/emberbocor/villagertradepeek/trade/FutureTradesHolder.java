@@ -1,6 +1,6 @@
 package io.github.emberbocor.villagertradepeek.trade;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public interface FutureTradesHolder {
     @Nullable

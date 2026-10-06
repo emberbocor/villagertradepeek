@@ -2,7 +2,7 @@ package io.github.emberbocor.villagertradepeek.trade;
 
 import java.util.Optional;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import io.github.emberbocor.villagertradepeek.VillagerTradePeek;
 import net.minecraft.Util;
