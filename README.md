@@ -28,7 +28,7 @@ Available for NeoForge and Fabric.
 |---|---|---|
 | Minecraft | 1.21.1 | 1.21 or 1.21.1 |
 | Loader | NeoForge 21.1.1 or newer | Fabric Loader 0.15.11 or newer |
-| Other | | Fabric API |
+| Other | | Fabric API 0.102.0 or newer |
 | Jar | `villagertradepeek-neoforge-1.21.1-<version>.jar` | `villagertradepeek-fabric-1.21-1.21.1-<version>.jar` |
 
 No configuration needed.
