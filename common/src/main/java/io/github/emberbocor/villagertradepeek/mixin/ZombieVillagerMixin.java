@@ -32,7 +32,7 @@ public abstract class ZombieVillagerMixin implements FutureTradesHolder {
 
     @Inject(method = "addAdditionalSaveData", at = @At("TAIL"))
     private void villagertradepeek$saveFutureTrades(CompoundTag tag, CallbackInfo ci) {
-        FutureTradeStorage.save((ZombieVillager) (Object) this, villagertradepeek$futureTrades, tag);
+        FutureTradeStorage.save(villagertradepeek$futureTrades, tag);
     }
 
     @Inject(method = "readAdditionalSaveData", at = @At("TAIL"))

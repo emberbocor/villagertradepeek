@@ -1,0 +1,56 @@
+plugins {
+    id 'multiloader-loader'
+    id 'net.neoforged.moddev.legacyforge'
+}
+
+legacyForge {
+    if (project.hasProperty('neoforge_version')) {
+        enable {
+            neoForgeVersion = neoforge_version
+        }
+    } else {
+        version = "${minecraft_version}-${forge_version}"
+    }
+    validateAccessTransformers = true
+    accessTransformers.from(project(':common').file('src/main/resources/META-INF/accesstransformer.cfg').absolutePath)
+    parchment {
+        minecraftVersion = parchment_minecraft_version
+        mappingsVersion = parchment_mappings_version
+    }
+    runs {
+        configureEach {
+            gameDirectory = rootProject.file('runs/1.20.1/forge')
+            ideName = "Forge ${it.name.capitalize()} (${project.path})"
+            systemProperty 'forge.logging.markers', 'REGISTRIES'
+            logLevel = org.slf4j.event.Level.DEBUG
+        }
+        client {
+            client()
+        }
+        server {
+            server()
+            programArgument '--nogui'
+        }
+    }
+    mods {
+        "${mod_id}" {
+            sourceSet(sourceSets.main)
+        }
+    }
+}
+
+mixin {
+    add(sourceSets.main, "${mod_id}.refmap.json")
+    config("${mod_id}.mixins.json")
+}
+
+dependencies {
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+    annotationProcessor "io.github.llamalad7:mixinextras-common:${mixinextras_version}"
+    compileOnly "io.github.llamalad7:mixinextras-common:${mixinextras_version}"
+    implementation(jarJar("io.github.llamalad7:mixinextras-forge:${mixinextras_version}"))
+}
+
+jar {
+    manifest.attributes(['MixinConfigs': "${mod_id}.mixins.json"])
+}

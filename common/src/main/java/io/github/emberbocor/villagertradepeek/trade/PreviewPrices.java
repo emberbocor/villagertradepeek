@@ -6,6 +6,7 @@ import java.util.stream.IntStream;
 import io.github.emberbocor.villagertradepeek.mixin.VillagerInvoker;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.item.trading.MerchantOffers;
 
 public final class PreviewPrices {
@@ -14,7 +15,7 @@ public final class PreviewPrices {
 
     public static List<LockedTrade> withSpecialPrices(Villager villager, Player player, List<LockedTrade> trades) {
         MerchantOffers preview = new MerchantOffers();
-        trades.forEach(trade -> preview.add(trade.offer().copy()));
+        trades.forEach(trade -> preview.add(new MerchantOffer(trade.offer().createTag())));
         MerchantOffers offers = villager.getOffers();
         villager.setOffers(preview);
         try {

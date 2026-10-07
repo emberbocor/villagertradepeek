@@ -10,16 +10,15 @@ import java.util.WeakHashMap;
 import org.jetbrains.annotations.Nullable;
 
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import io.github.emberbocor.villagertradepeek.VillagerTradePeek;
 import io.github.emberbocor.villagertradepeek.mixin.TreasureMapForEmeraldsAccessor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
-import net.minecraft.core.Holder;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -31,17 +30,15 @@ import net.minecraft.world.entity.npc.VillagerTrades;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.MapItem;
-import net.minecraft.world.item.component.CustomData;
-import net.minecraft.world.item.trading.ItemCost;
 import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.levelgen.structure.Structure;
-import net.minecraft.world.level.saveddata.maps.MapDecorationType;
+import net.minecraft.world.level.saveddata.maps.MapDecoration;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 
 public final class DeferredMapTrades {
     private static final int SEARCH_RADIUS = 100;
-    private static final MapCodec<DeferredMap> MARKER_CODEC = DeferredMap.CODEC.fieldOf(VillagerTradePeek.MODID + ":deferred_map");
+    private static final String MARKER_KEY = VillagerTradePeek.MODID + ":deferred_map";
     private static final Map<ServerLevel, Map<SearchKey, Optional<BlockPos>>> STRUCTURE_CACHE = new WeakHashMap<>();
 
     private DeferredMapTrades() {
@@ -65,7 +62,7 @@ public final class DeferredMapTrades {
         ItemStack map = MapItem.create(mapLevel, target.getX(), target.getZ(), (byte) 2, true, true);
         MapItem.renderBiomePreviewMap(mapLevel, map);
         MapItemSavedData.addTargetDecoration(map, target, "+", deferred.decoration());
-        map.set(DataComponents.ITEM_NAME, offer.getResult().get(DataComponents.ITEM_NAME));
+        map.setHoverName(offer.getResult().getHoverName());
         return withResult(offer, map);
     }
 
@@ -74,17 +71,18 @@ public final class DeferredMapTrades {
             return offer;
         }
         ItemStack result = offer.getResult().copy();
-        result.remove(DataComponents.CUSTOM_DATA);
+        result.removeTagKey(MARKER_KEY);
         return withResult(offer, result);
     }
 
     private static MerchantOffer withResult(MerchantOffer offer, ItemStack result) {
-        return new MerchantOffer(offer.getItemCostA(), offer.getItemCostB(), result, offer.getUses(), offer.getMaxUses(), offer.getXp(), offer.getPriceMultiplier());
+        return new MerchantOffer(offer.getBaseCostA(), offer.getCostB(), result, offer.getUses(), offer.getMaxUses(), offer.getXp(), offer.getPriceMultiplier());
     }
 
     @Nullable
     private static DeferredMap deferredMap(ItemStack stack) {
-        return stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).read(MARKER_CODEC).result().orElse(null);
+        CompoundTag marker = stack.getTagElement(MARKER_KEY);
+        return marker != null ? DeferredMap.CODEC.parse(NbtOps.INSTANCE, marker).result().orElse(null) : null;
     }
 
     @Nullable
@@ -98,10 +96,18 @@ public final class DeferredMapTrades {
     private record SearchKey(TagKey<Structure> destination, ChunkPos chunk) {
     }
 
-    private record DeferredMap(TagKey<Structure> destination, Holder<MapDecorationType> decoration, GlobalPos fallbackTarget) {
+    private record DeferredMap(TagKey<Structure> destination, MapDecoration.Type decoration, GlobalPos fallbackTarget) {
+        private static final Codec<MapDecoration.Type> DECORATION_CODEC = Codec.STRING.comapFlatMap(name -> {
+            try {
+                return DataResult.success(MapDecoration.Type.valueOf(name));
+            } catch (IllegalArgumentException e) {
+                return DataResult.error(() -> "Unknown map decoration: " + name);
+            }
+        }, MapDecoration.Type::name);
+
         private static final Codec<DeferredMap> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                 TagKey.codec(Registries.STRUCTURE).fieldOf("destination").forGetter(DeferredMap::destination),
-                MapDecorationType.CODEC.fieldOf("decoration").forGetter(DeferredMap::decoration),
+                DECORATION_CODEC.fieldOf("decoration").forGetter(DeferredMap::decoration),
                 GlobalPos.CODEC.fieldOf("fallback_target").forGetter(DeferredMap::fallbackTarget)
         ).apply(instance, DeferredMap::new));
     }
@@ -119,11 +125,12 @@ public final class DeferredMapTrades {
                 return null;
             }
             ItemStack placeholder = new ItemStack(Items.FILLED_MAP);
-            placeholder.set(DataComponents.ITEM_NAME, Component.translatable(map.villagertradepeek$getDisplayName()));
-            placeholder.set(DataComponents.CUSTOM_DATA, CustomData.EMPTY
-                    .update(NbtOps.INSTANCE, MARKER_CODEC, new DeferredMap(destination, map.villagertradepeek$getDestinationType(), GlobalPos.of(level.dimension(), target)))
-                    .getOrThrow());
-            return new MerchantOffer(new ItemCost(Items.EMERALD, map.villagertradepeek$getEmeraldCost()), Optional.of(new ItemCost(Items.COMPASS)),
+            placeholder.setHoverName(Component.translatable(map.villagertradepeek$getDisplayName()));
+            placeholder.getOrCreateTag().put(MARKER_KEY, DeferredMap.CODEC
+                    .encodeStart(NbtOps.INSTANCE, new DeferredMap(destination, map.villagertradepeek$getDestinationType(), GlobalPos.of(level.dimension(), target)))
+                    .result()
+                    .orElseThrow());
+            return new MerchantOffer(new ItemStack(Items.EMERALD, map.villagertradepeek$getEmeraldCost()), new ItemStack(Items.COMPASS),
                     placeholder, map.villagertradepeek$getMaxUses(), map.villagertradepeek$getVillagerXp(), 0.2F);
         }
     }

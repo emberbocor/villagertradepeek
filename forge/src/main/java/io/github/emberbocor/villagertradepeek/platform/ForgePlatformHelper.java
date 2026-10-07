@@ -1,11 +1,12 @@
 package io.github.emberbocor.villagertradepeek.platform;
 
+import io.github.emberbocor.villagertradepeek.network.ForgeNetwork;
 import io.github.emberbocor.villagertradepeek.network.FutureTradesPayload;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.fml.loading.FMLEnvironment;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.minecraftforge.fml.loading.FMLEnvironment;
+import net.minecraftforge.network.PacketDistributor;
 
-public final class NeoForgePlatformHelper implements PlatformHelper {
+public final class ForgePlatformHelper implements PlatformHelper {
     @Override
     public boolean isDevelopmentEnvironment() {
         return !FMLEnvironment.production;
@@ -13,11 +14,11 @@ public final class NeoForgePlatformHelper implements PlatformHelper {
 
     @Override
     public boolean canReceiveFutureTrades(ServerPlayer player) {
-        return player.connection.hasChannel(FutureTradesPayload.TYPE);
+        return ForgeNetwork.CHANNEL.isRemotePresent(player.connection.connection);
     }
 
     @Override
     public void sendFutureTrades(ServerPlayer player, FutureTradesPayload payload) {
-        PacketDistributor.sendToPlayer(player, payload);
+        ForgeNetwork.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), payload);
     }
 }

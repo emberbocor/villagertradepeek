@@ -12,7 +12,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.npc.Villager;
 
 public final class FutureTradeStorage {
-    private static final String NBT_KEY = VillagerTradePeek.MODID + ":future_trades";
+    private static final String NBT_KEY = VillagerTradePeek.MODID + ":future_trades_1_20";
 
     private FutureTradeStorage() {
     }
@@ -29,9 +29,9 @@ public final class FutureTradeStorage {
         ((FutureTradesHolder) villager).villagertradepeek$setFutureTrades(null);
     }
 
-    public static void save(Entity entity, @Nullable FutureTrades trades, CompoundTag tag) {
+    public static void save(@Nullable FutureTrades trades, CompoundTag tag) {
         if (trades != null) {
-            FutureTrades.CODEC.encodeStart(entity.registryAccess().createSerializationContext(NbtOps.INSTANCE), trades)
+            FutureTrades.CODEC.encodeStart(NbtOps.INSTANCE, trades)
                     .resultOrPartial(Util.prefix("Failed to save future trades: ", VillagerTradePeek.LOGGER::error))
                     .ifPresent(encoded -> tag.put(NBT_KEY, encoded));
         }
@@ -40,7 +40,7 @@ public final class FutureTradeStorage {
     public static void load(Entity entity, CompoundTag tag) {
         if (tag.contains(NBT_KEY)) {
             ((FutureTradesHolder) entity).villagertradepeek$setFutureTrades(FutureTrades.CODEC
-                    .parse(entity.registryAccess().createSerializationContext(NbtOps.INSTANCE), tag.get(NBT_KEY))
+                    .parse(NbtOps.INSTANCE, tag.get(NBT_KEY))
                     .resultOrPartial(Util.prefix("Failed to load future trades: ", VillagerTradePeek.LOGGER::warn))
                     .orElse(null));
         }

@@ -14,7 +14,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import com.mojang.blaze3d.systems.RenderSystem;
 
 import io.github.emberbocor.villagertradepeek.client.LockedTradesHolder;
 import io.github.emberbocor.villagertradepeek.platform.ClientServices;
@@ -25,7 +24,6 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.MerchantScreen;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.MerchantMenu;
@@ -45,9 +43,6 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
 
     @Shadow
     @Final
-    private static ResourceLocation TRADE_ARROW_SPRITE;
-    @Shadow
-    @Final
     private MerchantScreen.TradeOfferButton[] tradeOfferButtons;
     @Shadow
     int scrollOff;
@@ -61,6 +56,11 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
 
     @Shadow
     private void renderAndDecorateCostA(GuiGraphics guiGraphics, ItemStack realCost, ItemStack baseCost, int x, int y) {
+        throw new AssertionError();
+    }
+
+    @Shadow
+    private void renderButtonArrows(GuiGraphics guiGraphics, MerchantOffer merchantOffer, int posX, int posY) {
         throw new AssertionError();
     }
 
@@ -152,8 +152,7 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
         guiGraphics.pose().translate(0.0F, 0.0F, 100.0F);
         renderAndDecorateCostA(guiGraphics, offer.getCostA(), offer.getBaseCostA(), x + 5, itemY);
         villagertradepeek$renderItem(guiGraphics, offer.getCostB(), x + 35, itemY);
-        RenderSystem.enableBlend();
-        guiGraphics.blitSprite(TRADE_ARROW_SPRITE, x + 55, itemY + 3, 10, 9);
+        renderButtonArrows(guiGraphics, offer, leftPos, itemY);
         villagertradepeek$renderItem(guiGraphics, offer.getResult(), x + 68, itemY);
         guiGraphics.pose().popPose();
         guiGraphics.fill(RenderType.guiOverlay(), x, y, x + ROW_WIDTH, y + ROW_HEIGHT, LOCKED_OVERLAY_COLOR);
