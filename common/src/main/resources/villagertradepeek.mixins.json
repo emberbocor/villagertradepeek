@@ -1,5 +1,6 @@
 {
   "required": true,
+  "minVersion": "0.8",
   "package": "io.github.emberbocor.villagertradepeek.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [

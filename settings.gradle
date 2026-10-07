@@ -24,3 +24,4 @@ rootProject.name = 'villagertradepeek'
 include('common')
 include('neoforge')
 include('fabric')
+include('forge')
