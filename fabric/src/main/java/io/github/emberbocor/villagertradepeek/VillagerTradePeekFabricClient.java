@@ -8,6 +8,9 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 public class VillagerTradePeekFabricClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
-        ClientPlayNetworking.registerGlobalReceiver(FutureTradesPayload.TYPE, (payload, context) -> ClientPayloadHandler.handleFutureTrades(payload));
+        ClientPlayNetworking.registerGlobalReceiver(FutureTradesPayload.ID, (client, handler, buf, responseSender) -> {
+            FutureTradesPayload payload = FutureTradesPayload.read(buf);
+            client.execute(() -> ClientPayloadHandler.handleFutureTrades(payload));
+        });
     }
 }

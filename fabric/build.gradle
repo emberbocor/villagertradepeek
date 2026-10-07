@@ -27,22 +27,27 @@ dependencies {
     }
     modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_api_version}"
+    annotationProcessor "io.github.llamalad7:mixinextras-common:${mixinextras_version}"
 }
 
 loom {
     accessWidenerPath = project(':common').file("src/main/resources/${mod_id}.accesswidener")
+    mixin {
+        useLegacyMixinAp = true
+        defaultRefmapName = "${mod_id}.refmap.json"
+    }
     runs {
         client {
             client()
             configName = 'Fabric Client'
             ideConfigGenerated(true)
-            runDir('runs/client')
+            runDir('../runs/1.20.1/fabric-client')
         }
         server {
             server()
             configName = 'Fabric Server'
             ideConfigGenerated(true)
-            runDir('runs/server')
+            runDir('../runs/1.20.1/fabric-server')
         }
     }
 }
