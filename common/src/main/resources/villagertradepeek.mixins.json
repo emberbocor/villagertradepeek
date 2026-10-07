@@ -1,0 +1,23 @@
+{
+  "required": true,
+  "package": "io.github.emberbocor.villagertradepeek.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "AbstractVillagerInvoker",
+    "MerchantMenuAccessor",
+    "MobMixin",
+    "TreasureMapForEmeraldsAccessor",
+    "VillagerInvoker",
+    "VillagerMixin",
+    "ZombieVillagerMixin"
+  ],
+  "client": [
+    "MerchantScreenMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "package": "io.github.emberbocor.villagertradepeek.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "ServerPlayerMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  }
+}
