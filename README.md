@@ -4,7 +4,7 @@ See every trade a villager will ever offer before you commit to it.
 
 Villager Trade Peek shows all trades a villager unlocks at future levels, up to Master, right in the vanilla trading screen. Locked trades are drawn greyed out below the trades that are already available, and hovering one tells you which level unlocks it.
 
-Available for NeoForge and Fabric.
+Available for NeoForge, Forge and Fabric.
 
 ![Scrolling through locked trades in the trading screen](docs/preview.png)
 
@@ -24,12 +24,14 @@ Available for NeoForge and Fabric.
 
 ## Requirements
 
-| | NeoForge | Fabric |
-|---|---|---|
-| Minecraft | 1.21.1 | 1.21 or 1.21.1 |
-| Loader | NeoForge 21.1.1 or newer | Fabric Loader 0.15.11 or newer |
-| Other | | Fabric API 0.102.0 or newer |
-| Jar | `villagertradepeek-neoforge-1.21.1-<version>.jar` | `villagertradepeek-fabric-1.21-1.21.1-<version>.jar` |
+| | NeoForge | Forge | Fabric |
+|---|---|---|---|
+| Minecraft | 1.21.1 | 1.21.1 | 1.21 or 1.21.1 |
+| Loader | NeoForge 21.1.1 or newer | Forge 52.1.0 or newer | Fabric Loader 0.15.11 or newer |
+| Other | | | Fabric API 0.102.0 or newer |
+| Jar | `villagertradepeek-neoforge-1.21.1-<version>.jar` | `villagertradepeek-forge-1.21.1-<version>.jar` | `villagertradepeek-fabric-1.21-1.21.1-<version>.jar` |
+
+On Minecraft 1.21.1, NeoForge and Forge are separate loaders that do not run each other's mods, so each has its own jar. Pick the jar that matches your loader. (This differs from Minecraft 1.20.1, where a single Forge jar also runs on NeoForge.)
 
 No configuration needed.
 
@@ -37,7 +39,7 @@ No configuration needed.
 
 Install the mod on both the client and the server.
 
-- **NeoForge:** the mod is required on both sides. Players without it cannot join a server that has it.
+- **NeoForge and Forge:** the mod is required on both sides. Players without it cannot join a server that has it; the connection is refused at login.
 - **Fabric:** install it on both sides to see the preview. Players without the mod can still join a server that has it and trade normally, they just do not see locked trades. A client with the mod on a server without it also works, without the preview.
 
 ## Commands
@@ -56,7 +58,7 @@ Mods that change how many trades a villager gets per level, or that replace the 
 ./gradlew build
 ```
 
-The jars are written to `neoforge/build/libs` and `fabric/build/libs`. The project follows the [MultiLoader-Template](https://github.com/jaredlll08/MultiLoader-Template) layout: shared code lives in `common`, loader-specific code in `neoforge` and `fabric`.
+The jars are written to `neoforge/build/libs`, `forge/build/libs` and `fabric/build/libs`. In `forge/build/libs`, use the jar without the `-slim` suffix; it bundles MixinExtras. The project follows the [MultiLoader-Template](https://github.com/jaredlll08/MultiLoader-Template) layout: shared code lives in `common`, loader-specific code in `neoforge`, `forge` and `fabric`.
 
 ## License
 
