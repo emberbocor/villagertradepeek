@@ -14,15 +14,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.mojang.blaze3d.vertex.PoseStack;
 
 import io.github.emberbocor.villagertradepeek.client.LockedTradesHolder;
 import io.github.emberbocor.villagertradepeek.platform.ClientServices;
 import io.github.emberbocor.villagertradepeek.trade.LockedTrade;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.MerchantScreen;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
@@ -40,6 +39,10 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
     private static final int ROW_HEIGHT = 20;
     @Unique
     private static final int LOCKED_OVERLAY_COLOR = 0x80303030;
+    @Unique
+    private static final float ROW_ITEM_BLIT_OFFSET = 100.0F;
+    @Unique
+    private static final double LOCKED_OVERLAY_Z = 310.0D;
 
     @Shadow
     @Final
@@ -55,12 +58,12 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
     }
 
     @Shadow
-    private void renderAndDecorateCostA(GuiGraphics guiGraphics, ItemStack realCost, ItemStack baseCost, int x, int y) {
+    private void renderAndDecorateCostA(PoseStack poseStack, ItemStack realCost, ItemStack baseCost, int x, int y) {
         throw new AssertionError();
     }
 
     @Shadow
-    private void renderButtonArrows(GuiGraphics guiGraphics, MerchantOffer merchantOffer, int posX, int posY) {
+    private void renderButtonArrows(PoseStack poseStack, MerchantOffer merchantOffer, int posX, int posY) {
         throw new AssertionError();
     }
 
@@ -82,7 +85,7 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
     }
 
     @Inject(method = "render", at = @At("HEAD"))
-    private void villagertradepeek$disableLockedButtonsOnRender(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
+    private void villagertradepeek$disableLockedButtonsOnRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
         villagertradepeek$disableLockedButtons();
     }
 
@@ -91,21 +94,38 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
         villagertradepeek$disableLockedButtons();
     }
 
-    @Inject(method = "render", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/screens/inventory/MerchantScreen;renderScroller(Lnet/minecraft/client/gui/GuiGraphics;IILnet/minecraft/world/item/trading/MerchantOffers;)V"))
-    private void villagertradepeek$renderLockedTrades(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
+    @Inject(method = "render", at = @At("TAIL"))
+    private void villagertradepeek$renderLockedTrades(PoseStack poseStack, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
+        int x = leftPos + 5;
+        int y = topPos + 18;
+        if (!menu.getOffers().isEmpty()) {
+            villagertradepeek$renderLockedRows(poseStack, x, y);
+        }
+        villagertradepeek$renderLockedTooltip(poseStack, mouseX, mouseY, x, y);
+    }
+
+    @Unique
+    private void villagertradepeek$renderLockedRows(PoseStack poseStack, int x, int y) {
+        itemRenderer.blitOffset = ROW_ITEM_BLIT_OFFSET;
         for (int row = 0; row < VISIBLE_ROWS; row++) {
             LockedTrade trade = villagertradepeek$lockedTradeAt(row);
             if (trade != null) {
-                villagertradepeek$renderLockedTrade(guiGraphics, trade.offer(), leftPos + 5, topPos + 18 + row * ROW_HEIGHT);
+                villagertradepeek$renderLockedTrade(poseStack, trade.offer(), x, y + row * ROW_HEIGHT);
             }
         }
+        itemRenderer.blitOffset = 0.0F;
+        poseStack.pushPose();
+        poseStack.translate(0.0D, 0.0D, LOCKED_OVERLAY_Z);
+        for (int row = 0; row < VISIBLE_ROWS; row++) {
+            if (villagertradepeek$lockedTradeAt(row) != null) {
+                fill(poseStack, x, y + row * ROW_HEIGHT, x + ROW_WIDTH, y + (row + 1) * ROW_HEIGHT, LOCKED_OVERLAY_COLOR);
+            }
+        }
+        poseStack.popPose();
     }
 
-    @Inject(method = "render", at = @At("TAIL"))
-    private void villagertradepeek$renderLockedTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
-        int x = leftPos + 5;
-        int y = topPos + 18;
+    @Unique
+    private void villagertradepeek$renderLockedTooltip(PoseStack poseStack, int mouseX, int mouseY, int x, int y) {
         if (mouseX < x || mouseX >= x + ROW_WIDTH || mouseY < y) {
             return;
         }
@@ -117,11 +137,11 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
                 .withStyle(ChatFormatting.YELLOW);
         ItemStack stack = villagertradepeek$hoveredStack(trade.offer(), mouseX - x);
         if (stack.isEmpty()) {
-            guiGraphics.renderTooltip(font, unlocksAt, mouseX, mouseY);
+            renderTooltip(poseStack, unlocksAt, mouseX, mouseY);
         } else {
-            List<Component> lines = new ArrayList<>(getTooltipFromContainerItem(stack));
+            List<Component> lines = new ArrayList<>(getTooltipFromItem(stack));
             lines.add(unlocksAt);
-            ClientServices.PLATFORM.renderItemTooltip(guiGraphics, font, lines, stack, mouseX, mouseY);
+            ClientServices.PLATFORM.renderItemTooltip(this, poseStack, lines, stack, mouseX, mouseY);
         }
     }
 
@@ -146,22 +166,18 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
     }
 
     @Unique
-    private void villagertradepeek$renderLockedTrade(GuiGraphics guiGraphics, MerchantOffer offer, int x, int y) {
+    private void villagertradepeek$renderLockedTrade(PoseStack poseStack, MerchantOffer offer, int x, int y) {
         int itemY = y + 1;
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(0.0F, 0.0F, 100.0F);
-        renderAndDecorateCostA(guiGraphics, offer.getCostA(), offer.getBaseCostA(), x + 5, itemY);
-        villagertradepeek$renderItem(guiGraphics, offer.getCostB(), x + 35, itemY);
-        renderButtonArrows(guiGraphics, offer, leftPos, itemY);
-        villagertradepeek$renderItem(guiGraphics, offer.getResult(), x + 68, itemY);
-        guiGraphics.pose().popPose();
-        guiGraphics.fill(RenderType.guiOverlay(), x, y, x + ROW_WIDTH, y + ROW_HEIGHT, LOCKED_OVERLAY_COLOR);
+        renderAndDecorateCostA(poseStack, offer.getCostA(), offer.getBaseCostA(), x + 5, itemY);
+        villagertradepeek$renderItem(offer.getCostB(), x + 35, itemY);
+        renderButtonArrows(poseStack, offer, leftPos, itemY);
+        villagertradepeek$renderItem(offer.getResult(), x + 68, itemY);
     }
 
     @Unique
-    private void villagertradepeek$renderItem(GuiGraphics guiGraphics, ItemStack stack, int x, int y) {
-        guiGraphics.renderFakeItem(stack, x, y);
-        guiGraphics.renderItemDecorations(font, stack, x, y);
+    private void villagertradepeek$renderItem(ItemStack stack, int x, int y) {
+        itemRenderer.renderAndDecorateFakeItem(stack, x, y);
+        itemRenderer.renderGuiItemDecorations(font, stack, x, y);
     }
 
     @Unique

@@ -2,11 +2,12 @@ package io.github.emberbocor.villagertradepeek.platform;
 
 import java.util.List;
 
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 
 public interface ClientPlatformHelper {
-    void renderItemTooltip(GuiGraphics guiGraphics, Font font, List<Component> lines, ItemStack stack, int mouseX, int mouseY);
+    void renderItemTooltip(Screen screen, PoseStack poseStack, List<Component> lines, ItemStack stack, int mouseX, int mouseY);
 }

@@ -8,7 +8,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.item.trading.MerchantOffer;
@@ -18,13 +18,13 @@ public record FutureTrades(VillagerProfession profession, Map<Integer, List<Merc
         try {
             return DataResult.success(Integer.parseInt(key));
         } catch (NumberFormatException e) {
-            return DataResult.error(() -> "Invalid villager level: " + key);
+            return DataResult.error("Invalid villager level: " + key);
         }
     }, String::valueOf);
     private static final Codec<MerchantOffer> OFFER_CODEC = CompoundTag.CODEC.xmap(MerchantOffer::new, MerchantOffer::createTag);
 
     public static final Codec<FutureTrades> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            BuiltInRegistries.VILLAGER_PROFESSION.byNameCodec().fieldOf("profession").forGetter(FutureTrades::profession),
+            Registry.VILLAGER_PROFESSION.byNameCodec().fieldOf("profession").forGetter(FutureTrades::profession),
             Codec.unboundedMap(LEVEL_KEY_CODEC, OFFER_CODEC.listOf()).fieldOf("levels").forGetter(FutureTrades::levels)
     ).apply(instance, FutureTrades::new));
 

@@ -11,7 +11,7 @@ import com.mojang.logging.LogUtils;
 
 import io.github.emberbocor.villagertradepeek.mixin.AbstractVillagerInvoker;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.Registry;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.npc.VillagerData;
 import net.minecraft.world.entity.npc.VillagerProfession;
@@ -42,7 +42,7 @@ public final class FutureTradeGenerator {
             }
         }
         LOGGER.debug("Generated future trades for {} from level {} in {} ms",
-                BuiltInRegistries.VILLAGER_PROFESSION.getKey(profession), fromLevel, TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime));
+                Registry.VILLAGER_PROFESSION.getKey(profession), fromLevel, TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime));
         return new FutureTrades(profession, levels);
     }
 }

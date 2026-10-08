@@ -17,7 +17,7 @@ import io.github.emberbocor.villagertradepeek.VillagerTradePeek;
 import io.github.emberbocor.villagertradepeek.mixin.TreasureMapForEmeraldsAccessor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
-import net.minecraft.core.registries.Registries;
+import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.chat.Component;
@@ -52,7 +52,7 @@ public final class DeferredMapTrades {
 
     public static MerchantOffer resolve(Villager villager, MerchantOffer offer) {
         DeferredMap deferred = deferredMap(offer.getResult());
-        if (deferred == null || !(villager.level() instanceof ServerLevel level)) {
+        if (deferred == null || !(villager.level instanceof ServerLevel level)) {
             return offer;
         }
         GlobalPos fallback = deferred.fallbackTarget();
@@ -101,12 +101,12 @@ public final class DeferredMapTrades {
             try {
                 return DataResult.success(MapDecoration.Type.valueOf(name));
             } catch (IllegalArgumentException e) {
-                return DataResult.error(() -> "Unknown map decoration: " + name);
+                return DataResult.error("Unknown map decoration: " + name);
             }
         }, MapDecoration.Type::name);
 
         private static final Codec<DeferredMap> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                TagKey.codec(Registries.STRUCTURE).fieldOf("destination").forGetter(DeferredMap::destination),
+                TagKey.codec(Registry.STRUCTURE_REGISTRY).fieldOf("destination").forGetter(DeferredMap::destination),
                 DECORATION_CODEC.fieldOf("decoration").forGetter(DeferredMap::decoration),
                 GlobalPos.CODEC.fieldOf("fallback_target").forGetter(DeferredMap::fallbackTarget)
         ).apply(instance, DeferredMap::new));
@@ -116,7 +116,7 @@ public final class DeferredMapTrades {
         @Nullable
         @Override
         public MerchantOffer getOffer(Entity trader, RandomSource random) {
-            if (!(trader.level() instanceof ServerLevel level)) {
+            if (!(trader.level instanceof ServerLevel level)) {
                 return null;
             }
             TagKey<Structure> destination = map.villagertradepeek$getDestination();

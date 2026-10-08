@@ -1,18 +1,6 @@
 pluginManagement {
     repositories {
         gradlePluginPortal()
-        exclusiveContent {
-            forRepository {
-                maven {
-                    name = 'Fabric'
-                    url = uri('https://maven.fabricmc.net')
-                }
-            }
-            filter {
-                includeGroupAndSubgroups('net.fabricmc')
-                includeGroup('fabric-loom')
-            }
-        }
     }
 }
 
@@ -23,4 +11,3 @@ plugins {
 rootProject.name = 'villagertradepeek'
 include('common')
 include('forge')
-include('fabric')

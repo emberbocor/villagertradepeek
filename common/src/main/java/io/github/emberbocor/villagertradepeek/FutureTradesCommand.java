@@ -14,7 +14,7 @@ import io.github.emberbocor.villagertradepeek.trade.FutureTrades;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.Registry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerPlayer;
@@ -56,10 +56,10 @@ public final class FutureTradesCommand {
     private static int print(CommandSourceStack source, Villager villager) {
         FutureTrades stored = FutureTradeStorage.get(villager).orElse(null);
         if (stored == null) {
-            source.sendSuccess(() -> Component.literal("No future trades stored"), false);
+            source.sendSuccess(Component.literal("No future trades stored"), false);
             return 0;
         }
-        source.sendSuccess(() -> Component.literal("Future trades for " + BuiltInRegistries.VILLAGER_PROFESSION.getKey(stored.profession())), false);
+        source.sendSuccess(Component.literal("Future trades for " + Registry.VILLAGER_PROFESSION.getKey(stored.profession())), false);
         stored.levels().entrySet().stream()
                 .sorted(Map.Entry.comparingByKey())
                 .forEach(entry -> printLevel(source, entry.getKey(), entry.getValue()));
@@ -76,14 +76,14 @@ public final class FutureTradesCommand {
             player.sendMerchantOffers(player.containerMenu.containerId, offers, VillagerData.MIN_VILLAGER_LEVEL,
                     villager.getVillagerXp(), villager.showProgressBar(), villager.canRestock());
         }
-        source.sendSuccess(() -> Component.literal("Rerolled level 1 trades"), true);
+        source.sendSuccess(Component.literal("Rerolled level 1 trades"), true);
         return 1;
     }
 
     private static void printLevel(CommandSourceStack source, int level, List<MerchantOffer> offers) {
-        source.sendSuccess(() -> Component.literal("Level " + level + ":"), false);
+        source.sendSuccess(Component.literal("Level " + level + ":"), false);
         for (MerchantOffer offer : offers) {
-            source.sendSuccess(() -> describe(offer), false);
+            source.sendSuccess(describe(offer), false);
         }
     }
 

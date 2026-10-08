@@ -19,7 +19,7 @@ legacyForge {
     }
     runs {
         configureEach {
-            gameDirectory = rootProject.file('runs/1.20.1/forge')
+            gameDirectory = rootProject.file('runs/1.19.2/forge')
             ideName = "Forge ${it.name.capitalize()} (${project.path})"
             systemProperty 'forge.logging.markers', 'REGISTRIES'
             logLevel = org.slf4j.event.Level.DEBUG
