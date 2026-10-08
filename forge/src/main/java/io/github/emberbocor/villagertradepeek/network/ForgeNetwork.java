@@ -20,12 +20,15 @@ public final class ForgeNetwork {
         CHANNEL.messageBuilder(FutureTradesPayload.class, 0, NetworkDirection.PLAY_TO_CLIENT)
                 .encoder(FutureTradesPayload::write)
                 .decoder(FutureTradesPayload::read)
-                .consumerMainThread((payload, context) -> ClientPayloadHandler.handleFutureTrades(payload))
+                .consumer((payload, context) -> {
+                    context.get().enqueueWork(() -> ClientPayloadHandler.handleFutureTrades(payload));
+                    context.get().setPacketHandled(true);
+                })
                 .add();
     }
 
     public static void onContainerOpen(PlayerContainerEvent.Open event) {
-        if (event.getEntity() instanceof ServerPlayer player) {
+        if (event.getPlayer() instanceof ServerPlayer player) {
             FutureTradeSync.onMenuOpened(player, event.getContainer());
         }
     }

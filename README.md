@@ -4,7 +4,7 @@ See every trade a villager will ever offer before you commit to it.
 
 Villager Trade Peek shows all trades a villager unlocks at future levels, up to Master, right in the vanilla trading screen. Locked trades are drawn greyed out below the trades that are already available, and hovering one tells you which level unlocks it.
 
-This is the Minecraft 1.19.2 version, available for Forge. The Minecraft 1.20.x version lives on the `1.20.1` branch and the Minecraft 1.21.x version on the `master` branch.
+This is the Minecraft 1.18.2 version, available for Forge. The Minecraft 1.19.2 version lives on the `1.19.2` branch, the Minecraft 1.20.x version on the `1.20.1` branch and the Minecraft 1.21.x version on the `master` branch.
 
 ![Scrolling through locked trades in the trading screen](docs/preview.png)
 
@@ -26,9 +26,9 @@ This is the Minecraft 1.19.2 version, available for Forge. The Minecraft 1.20.x 
 
 | | Forge |
 |---|---|
-| Minecraft | 1.19.2 |
-| Loader | Forge 43.0.0 or newer |
-| Jar | `villagertradepeek-forge-1.19.2-<version>.jar` |
+| Minecraft | 1.18.2 |
+| Loader | Forge 40.2.0 or newer |
+| Jar | `villagertradepeek-forge-1.18.2-<version>.jar` |
 
 No configuration needed.
 
@@ -46,14 +46,14 @@ Mods that add new trades or tradeable items to villagers work out of the box, be
 
 Mods that change how many trades a villager gets per level, or that replace the villager trade logic entirely, may produce trades that differ from the preview.
 
-## Upgrading a world to Minecraft 1.20.1
+## Upgrading a world to Minecraft 1.19.2 or 1.20.1
 
-This version stores future trades in the same format as the Minecraft 1.20.x version of the mod. When a world is upgraded to 1.20.1 with the 1.20.x version of the mod installed:
+This version stores future trades in the same format as the Minecraft 1.19.2 and 1.20.x versions of the mod. When a world is upgraded to 1.19.2 or 1.20.1 with the version of the mod for that Minecraft version installed:
 
 - Trades a villager has already unlocked are kept, like in vanilla.
-- The stored preview is kept, so villagers still unlock exactly the trades you previewed on 1.19.2.
+- The stored preview is kept, so villagers still unlock exactly the trades you previewed on 1.18.2, including explorer maps from cartographers.
 
-Upgrading further to Minecraft 1.21 works as described in the 1.20.x version: the preview is rolled again there.
+When a world is upgraded to Minecraft 1.21, the 1.21 version of the mod does not read this format: the preview is rolled again the first time you open the villager's trading screen. Trades already unlocked are kept and nothing is unlocked early.
 
 ## Building from source
 
