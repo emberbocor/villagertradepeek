@@ -8,7 +8,7 @@ import net.neoforged.neoforge.network.PacketDistributor;
 public final class NeoForgePlatformHelper implements PlatformHelper {
     @Override
     public boolean isDevelopmentEnvironment() {
-        return !FMLEnvironment.production;
+        return !FMLEnvironment.isProduction();
     }
 
     @Override
