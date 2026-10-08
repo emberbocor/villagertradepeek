@@ -5,7 +5,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.npc.VillagerTrades;
-import net.minecraft.world.level.levelgen.structure.Structure;
+import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.saveddata.maps.MapDecoration;
 
 @Mixin(VillagerTrades.TreasureMapForEmeralds.class)
@@ -14,7 +14,7 @@ public interface TreasureMapForEmeraldsAccessor {
     int villagertradepeek$getEmeraldCost();
 
     @Accessor("destination")
-    TagKey<Structure> villagertradepeek$getDestination();
+    TagKey<ConfiguredStructureFeature<?, ?>> villagertradepeek$getDestination();
 
     @Accessor("displayName")
     String villagertradepeek$getDisplayName();

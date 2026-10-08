@@ -17,6 +17,7 @@ import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.core.Registry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.npc.Villager;
@@ -26,8 +27,8 @@ import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.item.trading.MerchantOffers;
 
 public final class FutureTradesCommand {
-    private static final SimpleCommandExceptionType NOT_A_VILLAGER = new SimpleCommandExceptionType(Component.literal("Target is not a villager"));
-    private static final SimpleCommandExceptionType NOT_LEVEL_ONE = new SimpleCommandExceptionType(Component.literal("Villager is not level 1"));
+    private static final SimpleCommandExceptionType NOT_A_VILLAGER = new SimpleCommandExceptionType(new TextComponent("Target is not a villager"));
+    private static final SimpleCommandExceptionType NOT_LEVEL_ONE = new SimpleCommandExceptionType(new TextComponent("Villager is not level 1"));
 
     private FutureTradesCommand() {
     }
@@ -56,10 +57,10 @@ public final class FutureTradesCommand {
     private static int print(CommandSourceStack source, Villager villager) {
         FutureTrades stored = FutureTradeStorage.get(villager).orElse(null);
         if (stored == null) {
-            source.sendSuccess(Component.literal("No future trades stored"), false);
+            source.sendSuccess(new TextComponent("No future trades stored"), false);
             return 0;
         }
-        source.sendSuccess(Component.literal("Future trades for " + Registry.VILLAGER_PROFESSION.getKey(stored.profession())), false);
+        source.sendSuccess(new TextComponent("Future trades for " + Registry.VILLAGER_PROFESSION.getKey(stored.profession())), false);
         stored.levels().entrySet().stream()
                 .sorted(Map.Entry.comparingByKey())
                 .forEach(entry -> printLevel(source, entry.getKey(), entry.getValue()));
@@ -76,19 +77,19 @@ public final class FutureTradesCommand {
             player.sendMerchantOffers(player.containerMenu.containerId, offers, VillagerData.MIN_VILLAGER_LEVEL,
                     villager.getVillagerXp(), villager.showProgressBar(), villager.canRestock());
         }
-        source.sendSuccess(Component.literal("Rerolled level 1 trades"), true);
+        source.sendSuccess(new TextComponent("Rerolled level 1 trades"), true);
         return 1;
     }
 
     private static void printLevel(CommandSourceStack source, int level, List<MerchantOffer> offers) {
-        source.sendSuccess(Component.literal("Level " + level + ":"), false);
+        source.sendSuccess(new TextComponent("Level " + level + ":"), false);
         for (MerchantOffer offer : offers) {
             source.sendSuccess(describe(offer), false);
         }
     }
 
     private static Component describe(MerchantOffer offer) {
-        MutableComponent line = Component.literal("  ").append(describe(offer.getBaseCostA()));
+        MutableComponent line = new TextComponent("  ").append(describe(offer.getBaseCostA()));
         if (!offer.getCostB().isEmpty()) {
             line.append(" + ").append(describe(offer.getCostB()));
         }
@@ -96,6 +97,6 @@ public final class FutureTradesCommand {
     }
 
     private static Component describe(ItemStack stack) {
-        return Component.literal(stack.getCount() + "x ").append(stack.getDisplayName());
+        return new TextComponent(stack.getCount() + "x ").append(stack.getDisplayName());
     }
 }

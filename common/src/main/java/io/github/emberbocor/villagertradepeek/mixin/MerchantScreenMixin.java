@@ -23,6 +23,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.MerchantScreen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.MerchantMenu;
@@ -133,7 +134,7 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
         if (trade == null) {
             return;
         }
-        Component unlocksAt = Component.translatable("villagertradepeek.tooltip.unlocks_at", Component.translatable("merchant.level." + trade.level()))
+        Component unlocksAt = new TranslatableComponent("villagertradepeek.tooltip.unlocks_at", new TranslatableComponent("merchant.level." + trade.level()))
                 .withStyle(ChatFormatting.YELLOW);
         ItemStack stack = villagertradepeek$hoveredStack(trade.offer(), mouseX - x);
         if (stack.isEmpty()) {
