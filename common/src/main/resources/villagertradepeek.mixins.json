@@ -13,7 +13,6 @@
     "ZombieVillagerMixin"
   ],
   "client": [
-    "MerchantScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1

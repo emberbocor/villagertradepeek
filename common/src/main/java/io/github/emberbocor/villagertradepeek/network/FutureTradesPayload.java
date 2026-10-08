@@ -8,10 +8,10 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public record FutureTradesPayload(int containerId, List<LockedTrade> trades) implements CustomPacketPayload {
-    public static final Type<FutureTradesPayload> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(VillagerTradePeek.MODID, "future_trades"));
+    public static final Type<FutureTradesPayload> TYPE = new Type<>(Identifier.fromNamespaceAndPath(VillagerTradePeek.MODID, "future_trades"));
     public static final StreamCodec<RegistryFriendlyByteBuf, FutureTradesPayload> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.VAR_INT, FutureTradesPayload::containerId,
             LockedTrade.STREAM_CODEC.apply(ByteBufCodecs.list()), FutureTradesPayload::trades,

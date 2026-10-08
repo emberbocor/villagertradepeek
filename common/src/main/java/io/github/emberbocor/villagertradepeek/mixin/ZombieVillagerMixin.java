@@ -10,8 +10,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import io.github.emberbocor.villagertradepeek.trade.FutureTradeStorage;
 import io.github.emberbocor.villagertradepeek.trade.FutureTrades;
 import io.github.emberbocor.villagertradepeek.trade.FutureTradesHolder;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.entity.monster.ZombieVillager;
+import net.minecraft.world.entity.monster.zombie.ZombieVillager;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 @Mixin(ZombieVillager.class)
 public abstract class ZombieVillagerMixin implements FutureTradesHolder {
@@ -31,12 +32,12 @@ public abstract class ZombieVillagerMixin implements FutureTradesHolder {
     }
 
     @Inject(method = "addAdditionalSaveData", at = @At("TAIL"))
-    private void villagertradepeek$saveFutureTrades(CompoundTag tag, CallbackInfo ci) {
-        FutureTradeStorage.save((ZombieVillager) (Object) this, villagertradepeek$futureTrades, tag);
+    private void villagertradepeek$saveFutureTrades(ValueOutput output, CallbackInfo ci) {
+        FutureTradeStorage.save(output, villagertradepeek$futureTrades);
     }
 
     @Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
-    private void villagertradepeek$loadFutureTrades(CompoundTag tag, CallbackInfo ci) {
-        FutureTradeStorage.load((ZombieVillager) (Object) this, tag);
+    private void villagertradepeek$loadFutureTrades(ValueInput input, CallbackInfo ci) {
+        villagertradepeek$futureTrades = FutureTradeStorage.load(input, ((ZombieVillager) (Object) this).registryAccess());
     }
 }

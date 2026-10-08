@@ -12,6 +12,8 @@ neoForge {
     }
 }
 
+sourceSets.main.java.exclude('**/mixin/MerchantScreenMixin.java')
+
 dependencies {
     compileOnly 'org.spongepowered:mixin:0.8.5'
     compileOnly "io.github.llamalad7:mixinextras-common:${mixinextras_version}"

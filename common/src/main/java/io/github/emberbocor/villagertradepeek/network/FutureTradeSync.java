@@ -8,7 +8,7 @@ import io.github.emberbocor.villagertradepeek.trade.FutureTradeManager;
 import io.github.emberbocor.villagertradepeek.trade.LockedTrade;
 import io.github.emberbocor.villagertradepeek.trade.PreviewPrices;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.entity.npc.villager.Villager;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MerchantMenu;
 
@@ -38,7 +38,7 @@ public final class FutureTradeSync {
         }
         syncing = true;
         try {
-            List<LockedTrade> trades = PreviewPrices.withSpecialPrices(villager, player, FutureTradeManager.previewTrades(villager).lockedTrades());
+            List<LockedTrade> trades = PreviewPrices.withSpecialPrices(villager, player, FutureTradeManager.previewTrades(player.level(), villager).lockedTrades());
             Services.PLATFORM.sendFutureTrades(player, new FutureTradesPayload(menu.containerId, trades));
         } finally {
             syncing = false;

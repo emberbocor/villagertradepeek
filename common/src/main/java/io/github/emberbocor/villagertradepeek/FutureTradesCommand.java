@@ -14,13 +14,12 @@ import io.github.emberbocor.villagertradepeek.trade.FutureTrades;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.npc.Villager;
-import net.minecraft.world.entity.npc.VillagerData;
+import net.minecraft.world.entity.npc.villager.Villager;
+import net.minecraft.world.entity.npc.villager.VillagerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.item.trading.MerchantOffers;
@@ -34,7 +33,7 @@ public final class FutureTradesCommand {
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         LiteralArgumentBuilder<CommandSourceStack> root = Commands.literal(VillagerTradePeek.MODID)
-                .requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.literal("future")
                         .then(Commands.argument("villager", EntityArgument.entity())
                                 .executes(context -> print(context.getSource(), villager(EntityArgument.getEntity(context, "villager"))))));
@@ -59,7 +58,7 @@ public final class FutureTradesCommand {
             source.sendSuccess(() -> Component.literal("No future trades stored"), false);
             return 0;
         }
-        source.sendSuccess(() -> Component.literal("Future trades for " + BuiltInRegistries.VILLAGER_PROFESSION.getKey(stored.profession())), false);
+        source.sendSuccess(() -> Component.literal("Future trades for " + stored.profession().getRegisteredName()), false);
         stored.levels().entrySet().stream()
                 .sorted(Map.Entry.comparingByKey())
                 .forEach(entry -> printLevel(source, entry.getKey(), entry.getValue()));
@@ -67,7 +66,7 @@ public final class FutureTradesCommand {
     }
 
     private static int reroll(CommandSourceStack source, Villager villager) throws CommandSyntaxException {
-        if (villager.getVillagerData().getLevel() != VillagerData.MIN_VILLAGER_LEVEL) {
+        if (villager.getVillagerData().level() != VillagerData.MIN_VILLAGER_LEVEL) {
             throw NOT_LEVEL_ONE.create();
         }
         villager.setOffers(null);

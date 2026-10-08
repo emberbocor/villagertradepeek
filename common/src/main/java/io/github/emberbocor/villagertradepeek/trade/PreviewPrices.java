@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 import io.github.emberbocor.villagertradepeek.mixin.VillagerInvoker;
-import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.entity.npc.villager.Villager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.trading.MerchantOffers;
 

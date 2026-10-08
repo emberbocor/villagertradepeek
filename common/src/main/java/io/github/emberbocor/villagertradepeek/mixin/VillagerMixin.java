@@ -12,8 +12,10 @@ import io.github.emberbocor.villagertradepeek.trade.FutureTradeManager;
 import io.github.emberbocor.villagertradepeek.trade.FutureTradeStorage;
 import io.github.emberbocor.villagertradepeek.trade.FutureTrades;
 import io.github.emberbocor.villagertradepeek.trade.FutureTradesHolder;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.npc.villager.Villager;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 @Mixin(Villager.class)
 public abstract class VillagerMixin implements FutureTradesHolder {
@@ -33,24 +35,24 @@ public abstract class VillagerMixin implements FutureTradesHolder {
     }
 
     @Inject(method = "addAdditionalSaveData", at = @At("TAIL"))
-    private void villagertradepeek$saveFutureTrades(CompoundTag tag, CallbackInfo ci) {
-        FutureTradeStorage.save((Villager) (Object) this, villagertradepeek$futureTrades, tag);
+    private void villagertradepeek$saveFutureTrades(ValueOutput output, CallbackInfo ci) {
+        FutureTradeStorage.save(output, villagertradepeek$futureTrades);
     }
 
     @Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
-    private void villagertradepeek$loadFutureTrades(CompoundTag tag, CallbackInfo ci) {
-        FutureTradeStorage.load((Villager) (Object) this, tag);
+    private void villagertradepeek$loadFutureTrades(ValueInput input, CallbackInfo ci) {
+        villagertradepeek$futureTrades = FutureTradeStorage.load(input, ((Villager) (Object) this).registryAccess());
     }
 
     @Inject(method = "updateTrades", at = @At("HEAD"), cancellable = true)
-    private void villagertradepeek$unlockStoredTrades(CallbackInfo ci) {
-        if (FutureTradeManager.unlockStoredTrades((Villager) (Object) this)) {
+    private void villagertradepeek$unlockStoredTrades(ServerLevel level, CallbackInfo ci) {
+        if (FutureTradeManager.unlockStoredTrades(level, (Villager) (Object) this)) {
             ci.cancel();
         }
     }
 
     @Inject(method = "updateTrades", at = @At("TAIL"))
-    private void villagertradepeek$discardRerolledFutureTrades(CallbackInfo ci) {
+    private void villagertradepeek$discardRerolledFutureTrades(ServerLevel level, CallbackInfo ci) {
         Villager villager = (Villager) (Object) this;
         if (FutureTradeManager.discardOnLevelOneTrades(villager)) {
             FutureTradeSync.syncTradingPlayer(villager);

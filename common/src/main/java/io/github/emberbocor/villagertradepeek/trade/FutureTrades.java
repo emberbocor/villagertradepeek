@@ -6,13 +6,15 @@ import java.util.Map;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
+import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.world.entity.npc.VillagerProfession;
+import net.minecraft.world.entity.npc.villager.VillagerProfession;
 import net.minecraft.world.item.trading.MerchantOffer;
 
-public record FutureTrades(VillagerProfession profession, Map<Integer, List<MerchantOffer>> levels) {
+public record FutureTrades(Holder<VillagerProfession> profession, Map<Integer, List<MerchantOffer>> levels) {
     private static final Codec<Integer> LEVEL_KEY_CODEC = Codec.STRING.comapFlatMap(key -> {
         try {
             return DataResult.success(Integer.parseInt(key));
@@ -21,8 +23,8 @@ public record FutureTrades(VillagerProfession profession, Map<Integer, List<Merc
         }
     }, String::valueOf);
 
-    public static final Codec<FutureTrades> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            BuiltInRegistries.VILLAGER_PROFESSION.byNameCodec().fieldOf("profession").forGetter(FutureTrades::profession),
+    public static final MapCodec<FutureTrades> MAP_CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+            BuiltInRegistries.VILLAGER_PROFESSION.holderByNameCodec().fieldOf("profession").forGetter(FutureTrades::profession),
             Codec.unboundedMap(LEVEL_KEY_CODEC, MerchantOffer.CODEC.listOf()).fieldOf("levels").forGetter(FutureTrades::levels)
     ).apply(instance, FutureTrades::new));
 

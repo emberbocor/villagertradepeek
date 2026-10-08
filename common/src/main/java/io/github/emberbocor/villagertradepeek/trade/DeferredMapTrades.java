@@ -10,7 +10,6 @@ import java.util.WeakHashMap;
 import org.jetbrains.annotations.Nullable;
 
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import io.github.emberbocor.villagertradepeek.VillagerTradePeek;
@@ -20,14 +19,16 @@ import net.minecraft.core.GlobalPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.npc.Villager;
-import net.minecraft.world.entity.npc.VillagerTrades;
+import net.minecraft.world.entity.npc.villager.Villager;
+import net.minecraft.world.entity.npc.villager.VillagerTrades;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.MapItem;
@@ -41,7 +42,7 @@ import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 
 public final class DeferredMapTrades {
     private static final int SEARCH_RADIUS = 100;
-    private static final MapCodec<DeferredMap> MARKER_CODEC = DeferredMap.CODEC.fieldOf(VillagerTradePeek.MODID + ":deferred_map");
+    private static final String MARKER_KEY = VillagerTradePeek.MODID + ":deferred_map";
     private static final Map<ServerLevel, Map<SearchKey, Optional<BlockPos>>> STRUCTURE_CACHE = new WeakHashMap<>();
 
     private DeferredMapTrades() {
@@ -53,9 +54,9 @@ public final class DeferredMapTrades {
                 .toArray(VillagerTrades.ItemListing[]::new);
     }
 
-    public static MerchantOffer resolve(Villager villager, MerchantOffer offer) {
+    public static MerchantOffer resolve(ServerLevel level, Villager villager, MerchantOffer offer) {
         DeferredMap deferred = deferredMap(offer.getResult());
-        if (deferred == null || !(villager.level() instanceof ServerLevel level)) {
+        if (deferred == null) {
             return offer;
         }
         GlobalPos fallback = deferred.fallbackTarget();
@@ -84,7 +85,8 @@ public final class DeferredMapTrades {
 
     @Nullable
     private static DeferredMap deferredMap(ItemStack stack) {
-        return stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).read(MARKER_CODEC).result().orElse(null);
+        Tag marker = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag().get(MARKER_KEY);
+        return marker != null ? DeferredMap.CODEC.parse(NbtOps.INSTANCE, marker).result().orElse(null) : null;
     }
 
     @Nullable
@@ -109,20 +111,19 @@ public final class DeferredMapTrades {
     private record Listing(TreasureMapForEmeraldsAccessor map) implements VillagerTrades.ItemListing {
         @Nullable
         @Override
-        public MerchantOffer getOffer(Entity trader, RandomSource random) {
-            if (!(trader.level() instanceof ServerLevel level)) {
-                return null;
-            }
+        public MerchantOffer getOffer(ServerLevel level, Entity trader, RandomSource random) {
             TagKey<Structure> destination = map.villagertradepeek$getDestination();
             BlockPos target = locate(level, destination, trader.blockPosition());
             if (target == null) {
                 return null;
             }
+            CompoundTag marker = new CompoundTag();
+            marker.put(MARKER_KEY, DeferredMap.CODEC
+                    .encodeStart(NbtOps.INSTANCE, new DeferredMap(destination, map.villagertradepeek$getDestinationType(), GlobalPos.of(level.dimension(), target)))
+                    .getOrThrow());
             ItemStack placeholder = new ItemStack(Items.FILLED_MAP);
             placeholder.set(DataComponents.ITEM_NAME, Component.translatable(map.villagertradepeek$getDisplayName()));
-            placeholder.set(DataComponents.CUSTOM_DATA, CustomData.EMPTY
-                    .update(NbtOps.INSTANCE, MARKER_CODEC, new DeferredMap(destination, map.villagertradepeek$getDestinationType(), GlobalPos.of(level.dimension(), target)))
-                    .getOrThrow());
+            placeholder.set(DataComponents.CUSTOM_DATA, CustomData.of(marker));
             return new MerchantOffer(new ItemCost(Items.EMERALD, map.villagertradepeek$getEmeraldCost()), Optional.of(new ItemCost(Items.COMPASS)),
                     placeholder, map.villagertradepeek$getMaxUses(), map.villagertradepeek$getVillagerXp(), 0.2F);
         }
