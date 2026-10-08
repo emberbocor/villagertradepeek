@@ -4,13 +4,7 @@ plugins {
 }
 
 legacyForge {
-    if (project.hasProperty('neoforge_version')) {
-        enable {
-            neoForgeVersion = neoforge_version
-        }
-    } else {
-        version = "${minecraft_version}-${forge_version}"
-    }
+    version = "${minecraft_version}-${forge_version}"
     validateAccessTransformers = true
     accessTransformers.from(project(':common').file('src/main/resources/META-INF/accesstransformer.cfg').absolutePath)
     parchment {
