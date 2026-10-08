@@ -4,7 +4,7 @@ See every trade a villager will ever offer before you commit to it.
 
 Villager Trade Peek shows all trades a villager unlocks at future levels, up to Master, right in the vanilla trading screen. Locked trades are drawn greyed out below the trades that are already available, and hovering one tells you which level unlocks it.
 
-Available for NeoForge, Forge and Fabric.
+This is the Minecraft 1.21.11 version, available for NeoForge, Forge and Fabric. The Minecraft 1.21.1 version lives on the `master` branch.
 
 ![Scrolling through locked trades in the trading screen](docs/preview.png)
 
@@ -26,12 +26,12 @@ Available for NeoForge, Forge and Fabric.
 
 | | NeoForge | Forge | Fabric |
 |---|---|---|---|
-| Minecraft | 1.21.1 | 1.21.1 | 1.21 or 1.21.1 |
-| Loader | NeoForge 21.1.1 or newer | Forge 52.1.0 or newer | Fabric Loader 0.15.11 or newer |
-| Other | | | Fabric API 0.102.0 or newer |
-| Jar | `villagertradepeek-neoforge-1.21.1-<version>.jar` | `villagertradepeek-forge-1.21.1-<version>.jar` | `villagertradepeek-fabric-1.21-1.21.1-<version>.jar` |
+| Minecraft | 1.21.11 | 1.21.11 | 1.21.11 |
+| Loader | NeoForge 21.11.42 or newer | Forge 61.0.1 or newer | Fabric Loader 0.17.3 or newer |
+| Other | | | Fabric API 0.139.5 or newer |
+| Jar | `villagertradepeek-neoforge-1.21.11-<version>.jar` | `villagertradepeek-forge-1.21.11-<version>.jar` | `villagertradepeek-fabric-1.21.11-<version>.jar` |
 
-On Minecraft 1.21.1, NeoForge and Forge are separate loaders that do not run each other's mods, so each has its own jar. Pick the jar that matches your loader. (This differs from Minecraft 1.20.1, where a single Forge jar also runs on NeoForge.)
+NeoForge and Forge are separate loaders that do not run each other's mods, so each has its own jar. Pick the jar that matches your loader.
 
 No configuration needed.
 
@@ -52,13 +52,21 @@ Mods that add new trades or tradeable items to villagers work out of the box, be
 
 Mods that change how many trades a villager gets per level, or that replace the villager trade logic entirely, may produce trades that differ from the preview.
 
+## Upgrading a world from Minecraft 1.21.1
+
+Item data changed between Minecraft 1.21.1 and 1.21.11, so future trades stored by the 1.21.1 version of the mod are not reused. When a world is upgraded:
+
+- Trades a villager has already unlocked are kept, like in vanilla.
+- The stored preview is discarded and the remaining levels are rolled again the first time you open the villager's trading screen, so they may differ from what you saw on 1.21.1.
+- Nothing is unlocked early and no trade is carried over with wrong prices or items.
+
 ## Building from source
 
 ```
 ./gradlew build
 ```
 
-The jars are written to `neoforge/build/libs`, `forge/build/libs` and `fabric/build/libs`. In `forge/build/libs`, use the jar without the `-slim` suffix; it bundles MixinExtras. The project follows the [MultiLoader-Template](https://github.com/jaredlll08/MultiLoader-Template) layout: shared code lives in `common`, loader-specific code in `neoforge`, `forge` and `fabric`.
+The jars are written to `neoforge/build/libs`, `forge/build/libs` and `fabric/build/libs`. The project follows the [MultiLoader-Template](https://github.com/jaredlll08/MultiLoader-Template) layout: shared code lives in `common`, loader-specific code in `neoforge`, `forge` and `fabric`.
 
 ## License
 
