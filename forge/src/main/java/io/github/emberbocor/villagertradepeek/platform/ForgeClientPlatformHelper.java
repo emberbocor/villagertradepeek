@@ -10,6 +10,6 @@ import net.minecraft.world.item.ItemStack;
 public final class ForgeClientPlatformHelper implements ClientPlatformHelper {
     @Override
     public void renderItemTooltip(GuiGraphics guiGraphics, Font font, List<Component> lines, ItemStack stack, int mouseX, int mouseY) {
-        guiGraphics.renderTooltip(font, lines, stack.getTooltipImage(), stack, mouseX, mouseY);
+        guiGraphics.setTooltipForNextFrame(font, lines, stack.getTooltipImage(), stack, mouseX, mouseY);
     }
 }
